@@ -94,4 +94,52 @@ describe("TypedPrompt runtime behavior", () => {
 
     expect(result).toBe("Charlie from Acme Corp (Admin)");
   });
+
+  it("should support {{this}} in loops over primitive arrays", () => {
+    interface Input {
+      tags: string[];
+    }
+
+    const prompt = TypedPrompt<Input>()(
+      "Tags: {{#each tags}}{{this}} {{/each}}"
+    );
+
+    const result = prompt.compile({
+      tags: ["javascript", "typescript", "node"],
+    });
+
+    expect(result).toBe("Tags: javascript typescript node ");
+  });
+
+  it("should support {{this}} in nested loops", () => {
+    interface Input {
+      names: { first: string; last: string; middleNames: string[] }[];
+    }
+
+    const prompt = TypedPrompt<Input>()(
+      "{{#each names}}Hello, {{first}} {{last}} {{#each middleNames}}{{this}} {{/each}}!{{/each}}"
+    );
+
+    const result = prompt.compile({
+      names: [{ first: "Harry", last: "Gao", middleNames: ["James", "John"] }],
+    });
+
+    expect(result).toBe("Hello, Harry Gao James John !");
+  });
+
+  it("should support {{this}} with number arrays", () => {
+    interface Input {
+      scores: number[];
+    }
+
+    const prompt = TypedPrompt<Input>()(
+      "Scores: {{#each scores}}{{this}}, {{/each}}"
+    );
+
+    const result = prompt.compile({
+      scores: [95, 87, 92],
+    });
+
+    expect(result).toBe("Scores: 95, 87, 92, ");
+  });
 });

@@ -66,7 +66,9 @@ type ProcessTemplate<
       : BodyErrors
     : never
   : Template extends `${string}{{${infer Variable}}}${infer After}`
-  ? PathExists<Context, Variable> extends false
+  ? Variable extends "this"
+    ? ProcessTemplate<Input, After, Context>
+    : PathExists<Context, Variable> extends false
     ? Variable
     : ProcessTemplate<Input, After, Context>
   : never;
@@ -80,6 +82,8 @@ type ProcessTemplateBody<
   Context
 > = Template extends `${string}{{${infer Variable}}}${infer After}`
   ? Variable extends `#${string}` | `/${string}`
+    ? ProcessTemplateBody<Input, After, Context>
+    : Variable extends "this"
     ? ProcessTemplateBody<Input, After, Context>
     : PathExists<Context, Variable> extends false
     ? Variable

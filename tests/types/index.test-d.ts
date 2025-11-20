@@ -83,3 +83,39 @@ interface AnyInput {
 }
 const noVarsPrompt = TypedPrompt<AnyInput>()("Static text only");
 expectType<{ compile: (data: AnyInput) => string }>(noVarsPrompt);
+
+// Test 10: {{this}} should work in loops over primitive arrays
+interface PrimitiveArrayInput {
+  tags: string[];
+}
+const thisPrompt = TypedPrompt<PrimitiveArrayInput>()(
+  "{{#each tags}}{{this}} {{/each}}"
+);
+expectType<{ compile: (data: PrimitiveArrayInput) => string }>(thisPrompt);
+
+// Test 11: {{this}} should work in nested loops
+interface NestedLoopInput {
+  names: { first: string; last: string; middleNames: string[] }[];
+}
+const nestedThisPrompt = TypedPrompt<NestedLoopInput>()(
+  "{{#each names}}Hello, {{first}} {{last}} {{#each middleNames}}{{this}} {{/each}}!{{/each}}"
+);
+expectType<{ compile: (data: NestedLoopInput) => string }>(nestedThisPrompt);
+
+// Test 12: {{this}} with number arrays
+interface NumberArrayInput {
+  scores: number[];
+}
+const numberThisPrompt = TypedPrompt<NumberArrayInput>()(
+  "{{#each scores}}{{this}}, {{/each}}"
+);
+expectType<{ compile: (data: NumberArrayInput) => string }>(numberThisPrompt);
+
+// Test 13: Complex template with {{this}} and property access in same loop
+interface ComplexLoopInput {
+  items: Array<{ name: string; tags: string[] }>;
+}
+const complexLoopPrompt = TypedPrompt<ComplexLoopInput>()(
+  "{{#each items}}{{name}}: {{#each tags}}{{this}} {{/each}}\n{{/each}}"
+);
+expectType<{ compile: (data: ComplexLoopInput) => string }>(complexLoopPrompt);
