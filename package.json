@@ -1,6 +1,6 @@
 {
   "name": "typed-prompt",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Type-safe prompt templating library with Handlebars",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
