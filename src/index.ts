@@ -26,8 +26,7 @@ export function TypedPrompt<Input>() {
       ? Template
       : ValidateTemplate<Input, Template>
   ): TypedPromptResult<Input> => {
-    // Runtime implementation - just compile with Handlebars
-    const compiledTemplate = Handlebars.compile(template);
+    const compiledTemplate = Handlebars.compile(template, { noEscape: true });
 
     const result: TypedPromptResult<Input> = {
       compile: (data: Input) => compiledTemplate(data),
