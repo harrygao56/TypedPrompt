@@ -40,54 +40,50 @@ type ExtractAllExpressions<T extends string> =
     : never;
 
 /**
- * Processes the template to validate variables within their context
- * This recursively processes the template and tracks context changes (e.g., inside #each blocks)
+ * Stack helpers for context tracking
+ */
+type StackTop<S extends any[]> = S extends [infer H, ...any[]] ? H : never;
+
+/**
+ * Pops the stack by one level but never below the base (length 1)
+ */
+type StackPop<S extends any[]> = S extends [any, ...infer R]
+  ? R extends []
+    ? S
+    : R
+  : S;
+
+/**
+ * Processes the template to validate variables within their context by scanning tokens
+ * Tracks nested contexts (e.g., inside #each blocks) using a stack to support infinite nesting
  */
 type ProcessTemplate<
   Input,
   Template extends string,
-  Context = Input
-> = Template extends `${string}{{#each ${infer ArrayPath}}}${infer Body}{{/each}}${infer After}`
-  ? PathExists<Input, ArrayPath> extends false
-    ? ArrayPath
-    : GetTypeAtPath<Input, ArrayPath> extends (infer ElementType)[]
-    ? ProcessTemplateBody<Input, Body, ElementType> extends infer BodyErrors
-      ? BodyErrors extends never
-        ? ProcessTemplate<Input, After, Context>
-        : BodyErrors
-      : never
-    : ArrayPath
-  : Template extends `${string}{{#if ${infer CondPath}}}${infer Body}{{/if}}${infer After}`
-  ? PathExists<Input, CondPath> extends false
-    ? CondPath
-    : ProcessTemplate<Input, Body, Context> extends infer BodyErrors
-    ? BodyErrors extends never
-      ? ProcessTemplate<Input, After, Context>
-      : BodyErrors
-    : never
-  : Template extends `${string}{{${infer Variable}}}${infer After}`
-  ? Variable extends "this"
-    ? ProcessTemplate<Input, After, Context>
-    : PathExists<Context, Variable> extends false
-    ? Variable
-    : ProcessTemplate<Input, After, Context>
-  : never;
-
-/**
- * Process template body with a specific context
- */
-type ProcessTemplateBody<
-  Input,
-  Template extends string,
-  Context
-> = Template extends `${string}{{${infer Variable}}}${infer After}`
-  ? Variable extends `#${string}` | `/${string}`
-    ? ProcessTemplateBody<Input, After, Context>
-    : Variable extends "this"
-    ? ProcessTemplateBody<Input, After, Context>
-    : PathExists<Context, Variable> extends false
-    ? Variable
-    : ProcessTemplateBody<Input, After, Context>
+  CtxStack extends any[] = [Input]
+> = Template extends `${string}{{${infer Tag}}}${infer Rest}`
+  ? Tag extends `#each ${infer ArrayPath}`
+    ? PathExists<StackTop<CtxStack>, ArrayPath> extends true
+      ? GetTypeAtPath<
+          StackTop<CtxStack>,
+          ArrayPath
+        > extends (infer ElementType)[]
+        ? ProcessTemplate<Input, Rest, [ElementType, ...CtxStack]>
+        : ArrayPath
+      : ArrayPath
+    : Tag extends "/each"
+    ? ProcessTemplate<Input, Rest, StackPop<CtxStack>>
+    : Tag extends `#if ${infer CondPath}`
+    ? PathExists<StackTop<CtxStack>, CondPath> extends true
+      ? ProcessTemplate<Input, Rest, CtxStack>
+      : CondPath
+    : Tag extends "/if"
+    ? ProcessTemplate<Input, Rest, CtxStack>
+    : Tag extends "this"
+    ? ProcessTemplate<Input, Rest, CtxStack>
+    : PathExists<StackTop<CtxStack>, Tag> extends true
+    ? ProcessTemplate<Input, Rest, CtxStack>
+    : Tag
   : never;
 
 /**

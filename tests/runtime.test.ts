@@ -142,4 +142,40 @@ describe("TypedPrompt runtime behavior", () => {
 
     expect(result).toBe("Scores: 95, 87, 92, ");
   });
+
+  it("should handle nested arrays with object elements", () => {
+    interface Input {
+      candidates: {
+        name: string;
+        experiences: {
+          company: string;
+          title: string;
+          description: string;
+        }[];
+      }[];
+    }
+
+    const prompt = TypedPrompt<Input>()(
+      "{{#each candidates}}{{name}}\n{{#each experiences}}{{company}} - {{title}} - {{description}}\n{{/each}}{{/each}}"
+    );
+
+    const result = prompt.compile({
+      candidates: [
+        {
+          name: "John",
+          experiences: [
+            {
+              company: "Google",
+              title: "Software Engineer",
+              description: "Developed a new feature for the company's product",
+            },
+          ],
+        },
+      ],
+    });
+
+    expect(result).toBe(
+      "John\nGoogle - Software Engineer - Developed a new feature for the company's product\n"
+    );
+  });
 });
