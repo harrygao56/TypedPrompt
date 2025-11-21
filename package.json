@@ -1,6 +1,6 @@
 {
   "name": "typed-prompt",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Type-safe prompt templating library with Handlebars",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -13,12 +13,19 @@
     "test:types": "tsd",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["typescript", "handlebars", "mustache", "template", "prompt", "type-safe"],
+  "keywords": [
+    "typescript",
+    "handlebars",
+    "mustache",
+    "template",
+    "prompt",
+    "type-safe"
+  ],
   "author": "Harry Gao <harrygao56@gmail.com>",
   "repository": {
-     "type": "git",
-     "url": "https://github.com/harrygao56/TypedPrompt"
-   },
+    "type": "git",
+    "url": "https://github.com/harrygao56/TypedPrompt"
+  },
   "license": "MIT",
   "dependencies": {
     "handlebars": "^4.7.8"
