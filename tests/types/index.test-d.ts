@@ -137,7 +137,9 @@ const resumePrompt = TypedPrompt<ResumeInput>()(
 expectType<{ compile: (data: ResumeInput) => string }>(resumePrompt);
 
 // Test 15: Invalid inner property inside nested each should error
-const _badResumePrompt = TypedPrompt<ResumeInput>()(
+const badResumePrompt = TypedPrompt<ResumeInput>()(
   // @ts-expect-error Variable "companyName" does not exist
   "{{#each candidates}}{{#each experiences}}{{companyName}}{{/each}}{{/each}}"
 );
+
+void badResumePrompt;
