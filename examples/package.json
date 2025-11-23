@@ -1,0 +1,17 @@
+{
+    "name": "typed-prompt-examples",
+    "version": "0.0.0",
+    "private": true,
+    "description": "Examples for typed-prompt library",
+    "dependencies": {
+        "typed-prompt": "file:..",
+        "@langchain/core": "^1.0.6",
+        "@langchain/openai": "^1.1.2",
+        "langchain": "^1.0.6"
+    },
+    "devDependencies": {
+        "tsx": "^4.20.6",
+        "typescript": "^5.9.3",
+        "dotenv": "^17.2.3"
+    }
+}
