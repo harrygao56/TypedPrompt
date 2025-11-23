@@ -1,4 +1,4 @@
-import { TypedPrompt } from "../src/index";
+import { TypedPrompt } from "typed-prompt";
 import { HumanMessage } from "@langchain/core/messages";
 import { ChatOpenAI } from "@langchain/openai";
 import * as dotenv from "dotenv";
